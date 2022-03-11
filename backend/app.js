@@ -53,9 +53,9 @@ app.use((req, res, next) => {
 //--------Route POST -------- envoie la requete
 
 app.post('/api/stuff', (req, res, next) => { 
-    //console.log(req.body);
+    //body correspond au model de l'objet que l'on envoi
     delete req.body._id; // enlever le champ id (envoyé par le front-end) du corp de la requete (methode delete) car mongoos le genere automatiquement
-    const thing = new Thing({ /* creation d'une nouvelle instance (class objet) de le req*/  
+    const thing = new Thing({ /* creation d'une nouvelle instance  de mon objet thing (class) de le req*/  
         ...req.body // operateur spread (...) vas copier les champ de l'objet , dans le corp de la request body
     });
     thing.save() //methode save enregistre l'objet dans la base de donnée renvoi une promise
@@ -67,8 +67,8 @@ app.post('/api/stuff', (req, res, next) => {
 
 //--------Route Get --------
 
-//recuper un objet avec l'id
-app.get('/api/stuff/:id', (req, res, next) => { // : dit a express cette partie de route est dynamique recuprer l'id
+//recuper un objet avec l'id (identifiant vas envoyer l'id de l'objet)
+app.get('/api/stuff/:id', (req, res, next) => { // chercher l'identifiant dans la route , " : " dit a express cette partie de route est dynamique recuprer l'id
 req.params.id // avoir acces  dans l'objet req.pams.id
 Thing.findOne({_id: req.params.id}) //trouver un objet , on pass l'objet en conparaison _id  egal le parm de req id
 .then(thing => res.status(200).json(thing)) // retourne la response 200 pour ok pour la methode http , renvoi l'objet (un objet)si il existe dans la Bd
@@ -85,5 +85,17 @@ Thing.find() //trouve la liste d'objet (find) qui nous retourne une promise , en
 });
 
 //------------------
+
+//--------Route update --------
+
+    app.put('/api/stuff/:id', (req, res, next) => {  // id en paramettre de route
+        Thing.updateOne({_id: req.params.id }, // egale (clée -> valeur) function pour modifier un thigs (produit) dans la base de donnée
+        {...req.body,  //  spread pour recuperer le thing (produit) qui est dans le corp de la requete (objet body)
+         _id: req.params.id }) // et dire que l'id corespond a celui dees paramettre
+        .then(() => res.status(200).json({message: 'Objet modifié !'})) // retourne la response 200 pour ok pour la methode http , renvoi objet modifier
+        .catch(error => res.status(400).json({ error })); // capture l'erreur et renvoi un message erreur (egale error: error)
+});
+
+//---------------
 
 
